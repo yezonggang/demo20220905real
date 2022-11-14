@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.quick.start.demo.entity.RoleEntity;
 import com.quick.start.demo.entity.UserEntity;
 import com.quick.start.demo.framework.exception.ApiError;
+import com.quick.start.demo.framework.exception.ApiErrorEnum;
 import com.quick.start.demo.framework.response.Either;
 import com.quick.start.demo.mapper.RoleMapper;
 import com.quick.start.demo.service.IRoleService;
@@ -39,7 +40,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, RoleEntity> impleme
         try {
             roleMapper.insert(roleEntity);
         }catch (Exception e){
-            Either.Left(e);
+            Either.Left(ApiError.from(ApiErrorEnum.CHECK_DATABASE_WRONG));
         }finally {
             lock.unlock();
 
