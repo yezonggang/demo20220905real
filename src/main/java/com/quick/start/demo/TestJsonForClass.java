@@ -4,7 +4,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.quick.start.demo.entity.StudentTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author y25958
@@ -20,7 +25,7 @@ public class TestJsonForClass {
 
 
             // json数组转成对象的list
-        JSONArray jsonArray = JSONArray.parseArray(jsonString);
+        JSONArray jsonArray = JSONArray.parseArray(jsonArrayString);
 
         for(int i=0; i<jsonArray.size(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
@@ -28,6 +33,15 @@ public class TestJsonForClass {
             StudentTest studentTest2=mapper.readValue(object.toJSONString() , StudentTest.class);
             System.out.println(studentTest2.getStudentName());
         }
+
+
+        List list = null;
+        CollectionType collectionType = TypeFactory.defaultInstance().constructCollectionType(ArrayList.class, StudentTest.class);
+        try {
+            list = mapper.readValue(jsonArrayString, collectionType);
+        }catch (Exception e){
+        }
+        System.out.println(list.get(0));
     }
 
 
