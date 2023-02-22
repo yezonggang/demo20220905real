@@ -22,26 +22,20 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("permission")
-@ApiModel(value="PermissionEntity对象", description="")
-public class PermissionEntity implements Serializable {
+@TableName("refresh_token")
+@ApiModel(value="RefreshTokenEntity对象", description="")
+public class RefreshTokenEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @TableField("url")
-    private String url;
+    @TableField("usename")
+    private String usename;
 
-    @TableField("name")
-    private String name;
-
-    @TableField("description")
-    private String description;
-
-    @TableField("pid")
-    private Long pid;
+    @TableField("token")
+    private String token;
 
 
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2023-02-22
  */
 @RestController
-@RequestMapping("/role-entity")
-public class RoleController {
+@RequestMapping("/refresh-token-entity")
+public class RefreshTokenController {
 
 }

@@ -1,6 +1,6 @@
 package com.quick.start.demo.mapper;
 
-import com.quick.start.demo.entity.PermissionEntity;
+import com.quick.start.demo.entity.RefreshTokenEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author yzg
  * @since 2023-02-22
  */
-public interface PermissionMapper extends BaseMapper<PermissionEntity> {
+public interface RefreshTokenMapper extends BaseMapper<RefreshTokenEntity> {
+    String getRefreshToken(String username);
 
 }

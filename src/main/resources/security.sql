@@ -12,12 +12,12 @@ CREATE TABLE if not  exists `user` (
   `des` varchar(255),
   `tel` varchar(255),
   `email` varchar(255),
-  `create_time` timestamp,
-  `update_time` timestamp,
+  `create_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
-INSERT INTO `user` VALUES (2, 'editor', '$2a$10$JJ82/k3LicFc6kbCYP7ekO4MyepyQCL7w4vX1cgPzgy91nC2sALhi','testavatar','admin');
-INSERT INTO `user` VALUES (1, 'admin', '$2a$10$JJ82/k3LicFc6kbCYP7ekO4MyepyQCL7w4vX1cgPzgy91nC2sALhi','testavatar','editor');
+INSERT INTO `user` VALUES (2, 'editor', '$2a$10$JJ82/k3LicFc6kbCYP7ekO4MyepyQCL7w4vX1cgPzgy91nC2sALhi','testavatar','admin','admin','admin',NOW(),NOW());
+INSERT INTO `user` VALUES (1, 'admin', '$2a$10$JJ82/k3LicFc6kbCYP7ekO4MyepyQCL7w4vX1cgPzgy91nC2sALhi','testavatar','editor','admin','admin',NOW(),NOW());
 
 CREATE TABLE if not  exists `role` (
                         `id` bigint(11) NOT NULL AUTO_INCREMENT,

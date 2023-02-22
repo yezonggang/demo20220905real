@@ -1,6 +1,6 @@
 package com.quick.start.demo.service;
 
-import com.quick.start.demo.entity.UserEntity;
+import com.quick.start.demo.entity.AccountStateEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author yzg
  * @since 2023-02-22
  */
-public interface IUserService extends IService<UserEntity> {
+public interface IAccountStateService extends IService<AccountStateEntity> {
 
 }

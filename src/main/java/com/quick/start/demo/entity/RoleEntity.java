@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author yzg
- * @since 2022-09-05
+ * @since 2023-02-22
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -39,5 +39,6 @@ public class RoleEntity implements Serializable {
 
     @TableField("des")
     private String des;
+
 
 }

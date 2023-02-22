@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author yzg
- * @since 2022-09-05
+ * @since 2023-02-22
  */
 public interface IPermissionService extends IService<PermissionEntity> {
 

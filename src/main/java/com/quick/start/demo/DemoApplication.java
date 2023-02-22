@@ -2,6 +2,7 @@ package com.quick.start.demo;
 
 import com.quick.start.demo.utils.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -13,6 +14,7 @@ import java.util.Arrays;
  */
 @SpringBootApplication
 @Slf4j
+@MapperScan("com.quick.start.demo.mapper")
 public class DemoApplication {
 
     public static void main(String[] args) {

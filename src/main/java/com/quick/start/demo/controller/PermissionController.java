@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author yzg
- * @since 2022-09-05
+ * @since 2023-02-22
  */
 @RestController
 @RequestMapping("/permission-entity")
