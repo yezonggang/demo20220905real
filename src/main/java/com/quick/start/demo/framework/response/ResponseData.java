@@ -29,7 +29,7 @@ public class ResponseData implements Serializable {
     }
 
     public static ResponseData success(Object data){
-        return new ResponseData(200,SUCCESS,data);
+        return new ResponseData(20000,SUCCESS,data);
     }
     public static ResponseData fail(Object data){
         return new ResponseData(200,ERROR,data);

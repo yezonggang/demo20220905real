@@ -3,5 +3,5 @@
 <mapper namespace="com.quick.start.demo.mapper.RefreshTokenMapper">
 
 
-
+    <select id="getRefreshToken" resultType="java.lang.String"></select>
 </mapper>
