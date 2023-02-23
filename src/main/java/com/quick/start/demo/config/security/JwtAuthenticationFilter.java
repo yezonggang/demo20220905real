@@ -11,8 +11,6 @@ import com.quick.start.demo.mapper.RefreshTokenMapper;
 import com.quick.start.demo.service.impl.UserServiceImpl;
 import com.quick.start.demo.utils.JsonWebTokenUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JsonWebTokenUtil tokenUtil;
     private UserServiceImpl userServiceImpl;
     private RequestMatcher requestMatcher;
-    //private List<String> requestMatcher;
     private RefreshTokenMapper refreshTokenMapper;
 
     public JwtAuthenticationFilter(JsonWebTokenUtil tokenUtil, UserServiceImpl userServiceImpl, RequestMatcher requestMatcher,RefreshTokenMapper refreshTokenMapper) {
@@ -48,8 +45,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        logger.info(String.format("请求路径-->%s,是否应该被过滤掉-->%s",request.getRequestURL(),requestMatcher.matches(request)));
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        logger.info(String.format("请求路径-->%s,是否通过滤器-->%s",request.getRequestURL(),requestMatcher.matches(request)));
         return requestMatcher.matches(request);
     }
 
@@ -61,7 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         logger.info("urls:"+request.getRequestURI()+"jwt---->:"+jwt+request.getRequestURI().substring(0,request.getRequestURL().indexOf("/")));
             if (StringUtils.hasLength(jwt) && !jwt.equals("null") && !jwt.equals("undefined")) {
                 //从jwt中获取用户名,这里应该考虑过期时间，超过过期时间的话获取不到username
-                //TODO
                 String username = tokenUtil.getUsernameFromToken(jwt);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     LambdaQueryWrapper<RefreshTokenEntity> queryWrapper = new QueryWrapper<RefreshTokenEntity>().lambda().eq(RefreshTokenEntity::getUsename, username);
@@ -76,26 +72,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 userDetails.getPassword(), userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
+                    filterChain.doFilter(request, response);
+                } else {
+                    reject(request, response);
                 }
-                filterChain.doFilter(request, response);
             } else {
-                //logger.info(requestMatcher.toString());
                 reject(request, response);
             }
 
     }
 
     private static void reject(HttpServletRequest request,HttpServletResponse response) throws IOException{
-/*        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("status", true);
-        jsonObject.put("code",50054);
-        jsonObject.put("data","Token expired, please log in again.");
-        PrintWriter out = response.getWriter();
-        out.write(new ObjectMapper().writeValueAsString(jsonObject));*/
         log.info("filtered url:"+request.getRequestURI());
         PrintWriter out = response.getWriter();
         out.write(new ObjectMapper().writeValueAsString(ResponseData.fail(ApiError.from(ApiErrorEnum.HAVE_NO_TOKEN))));
         out.flush();
+        out.close();
     }
 
 }

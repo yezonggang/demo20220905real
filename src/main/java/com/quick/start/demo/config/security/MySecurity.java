@@ -32,6 +32,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -111,6 +112,7 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
         uris.add("/v2/**");
         uris.add("/api/**");
         uris.add("/swagger-ui.html");
+        uris.add("/favicon.ico");
         return new SkipPathAntMatcher(uris);
     }
 
@@ -149,15 +151,6 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
                 out.flush();
                 out.close();
             }
-
-/*          // 这种写法更简洁
-            @Override
-            public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                response.setContentType("application/json;charset=utf-8");
-                PrintWriter out = response.getWriter();
-                out.write(new ObjectMapper().writeValueAsString(ResponseData.success("logout success.")));
-                out.flush();
-                out.close();*/
         };
     }
 
@@ -185,15 +178,9 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
                 log.info("end to insert token");
             }
             response.setHeader(jsonWebTokenUtil.getHeader(), refreshToken);
-/*          Cookie cookie = new Cookie("token", refreshToken);
+            Cookie cookie = new Cookie("token", refreshToken);
             cookie.setPath("/");
-            response.addCookie(cookie)
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("status", true);
-            jsonObject.put("code",20000);
-            jsonObject.put("data",refreshToken);
-            out.write(new ObjectMapper().writeValueAsString(jsonObject));
-            ;*/
+            response.addCookie(cookie);
             PrintWriter out = response.getWriter();
             out.write(new ObjectMapper().writeValueAsString(ResponseData.success(refreshToken)));
             out.flush();

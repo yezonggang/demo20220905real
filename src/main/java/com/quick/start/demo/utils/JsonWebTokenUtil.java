@@ -79,7 +79,11 @@ public class JsonWebTokenUtil {
         String username;
         try {
             Claims claims=getClaimsFromToken(token);
-            username=claims.getSubject();
+            if (claims!=null){
+                username=claims.getSubject();
+            }else {
+                username = null;
+            }
         }catch (ExpiredJwtException e){
             username=null;
         }
@@ -107,7 +111,13 @@ public class JsonWebTokenUtil {
      * @return 数据声明
      */
     private Claims getClaimsFromToken(String token){
-        return Jwts.parser().setSigningKey(jsonWebTokenProperty.getSecret()).parseClaimsJws(token).getBody();
+        Claims claims;
+        try {
+            claims = Jwts.parser().setSigningKey(jsonWebTokenProperty.getSecret()).parseClaimsJws(token).getBody();
+        }catch (Exception e){
+            claims = null;
+        }
+        return claims;
     }
 
     /**

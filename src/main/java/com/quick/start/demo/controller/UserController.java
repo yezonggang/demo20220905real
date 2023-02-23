@@ -4,6 +4,7 @@ package com.quick.start.demo.controller;
 import com.quick.start.demo.framework.response.ResponseData;
 import com.quick.start.demo.service.impl.UserServiceImpl;
 import com.quick.start.demo.utils.AuthenticationFacade;
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Slf4j
 @RequestMapping("/user")
+@Api(tags = "用户管理")
 public class UserController {
 
     @Autowired
