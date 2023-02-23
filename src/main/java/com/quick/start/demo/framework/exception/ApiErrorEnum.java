@@ -5,7 +5,7 @@ public enum ApiErrorEnum {
 
     CHECK_DATABASE_WRONG("CHECK_DATABASE_WRONG","get data from database wrong",202200),
     TOKEN_EXPIRED("Token expired","get data from database wrong",50014),
-    HAVE_NO_TOKEN ("have no token","have no token or token expired",50021),
+    HAVE_NO_TOKEN_OR_TOKEN_EXPIRED ("have no token","have no token or token expired",50021),
     ACCESS_EXCEPTION("interface access exception","interface access exception",200);
 
 

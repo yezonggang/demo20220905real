@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private RequestMatcher requestMatcher;
     private RefreshTokenMapper refreshTokenMapper;
 
-    public JwtAuthenticationFilter(JsonWebTokenUtil tokenUtil, UserServiceImpl userServiceImpl, RequestMatcher requestMatcher,RefreshTokenMapper refreshTokenMapper) {
+    public JwtAuthenticationFilter(JsonWebTokenUtil tokenUtil, UserServiceImpl userServiceImpl, RequestMatcher requestMatcher, RefreshTokenMapper refreshTokenMapper) {
         this.tokenUtil = tokenUtil;
         this.userServiceImpl = userServiceImpl;
         this.requestMatcher = requestMatcher;
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        logger.info(String.format("请求路径-->%s,是否通过滤器-->%s",request.getRequestURL(),requestMatcher.matches(request)));
+        logger.info(String.format("请求路径-->%s,是否通过滤器-->%s", request.getRequestURL(), requestMatcher.matches(request)));
         return requestMatcher.matches(request);
     }
 
@@ -55,37 +55,37 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         //从请求头部获取json web token
         String jwt = request.getHeader(tokenUtil.getHeader());
-        logger.info("urls:"+request.getRequestURI()+"jwt---->:"+jwt+request.getRequestURI().substring(0,request.getRequestURL().indexOf("/")));
-            if (StringUtils.hasLength(jwt) && !jwt.equals("null") && !jwt.equals("undefined")) {
-                //从jwt中获取用户名,这里应该考虑过期时间，超过过期时间的话获取不到username
-                String username = tokenUtil.getUsernameFromToken(jwt);
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    LambdaQueryWrapper<RefreshTokenEntity> queryWrapper = new QueryWrapper<RefreshTokenEntity>().lambda().eq(RefreshTokenEntity::getUsename, username);
-                    RefreshTokenEntity refreshTokenEntity = refreshTokenMapper.selectOne(queryWrapper);
-                    String tokenInMysql = StringUtils.isEmpty(refreshTokenEntity) ? "null" : refreshTokenEntity.getToken();
-                    if (jwt.equals(tokenInMysql)) {
-                        logger.info("JwtAuthenticationFilter,username:" + username);
-                        //通过用户名查询
-                        UserDetails userDetails = userServiceImpl.loadUserByUsername(username);
-                        //创建认证信息
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,
-                                userDetails.getPassword(), userDetails.getAuthorities());
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
-                    filterChain.doFilter(request, response);
-                } else {
-                    reject(request, response);
+        logger.info("urls:" + request.getRequestURI() + "jwt---->:" + jwt + request.getRequestURI().substring(0, request.getRequestURL().indexOf("/")));
+        if (StringUtils.hasLength(jwt) && !jwt.equals("null") && !jwt.equals("undefined")) {
+            //从jwt中获取用户名,这里应该考虑过期时间，超过过期时间的话获取不到username
+            String username = tokenUtil.getUsernameFromToken(jwt);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                LambdaQueryWrapper<RefreshTokenEntity> queryWrapper = new QueryWrapper<RefreshTokenEntity>().lambda().eq(RefreshTokenEntity::getUsename, username);
+                RefreshTokenEntity refreshTokenEntity = refreshTokenMapper.selectOne(queryWrapper);
+                String tokenInMysql = StringUtils.isEmpty(refreshTokenEntity) ? "null" : refreshTokenEntity.getToken();
+                if (jwt.equals(tokenInMysql)) {
+                    logger.info("JwtAuthenticationFilter,username:" + username);
+                    //通过用户名查询
+                    UserDetails userDetails = userServiceImpl.loadUserByUsername(username);
+                    //创建认证信息
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,
+                            userDetails.getPassword(), userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
+                filterChain.doFilter(request, response);
             } else {
                 reject(request, response);
             }
+        } else {
+            reject(request, response);
+        }
 
     }
 
-    private static void reject(HttpServletRequest request,HttpServletResponse response) throws IOException{
-        log.info("filtered url:"+request.getRequestURI());
+    private static void reject(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        log.info("filtered url:" + request.getRequestURI());
         PrintWriter out = response.getWriter();
-        out.write(new ObjectMapper().writeValueAsString(ResponseData.fail(ApiError.from(ApiErrorEnum.HAVE_NO_TOKEN))));
+        out.write(new ObjectMapper().writeValueAsString(ResponseData.fail(ApiError.from(ApiErrorEnum.HAVE_NO_TOKEN_OR_TOKEN_EXPIRED))));
         out.flush();
         out.close();
     }
