@@ -11,6 +11,7 @@ import com.quick.start.demo.mapper.RefreshTokenMapper;
 import com.quick.start.demo.service.impl.UserServiceImpl;
 import com.quick.start.demo.utils.JsonWebTokenUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Locale;
 
 /**
  * 登录成功后，对此类进行鉴权
@@ -85,6 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static void reject(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("filtered url:" + request.getRequestURI());
         PrintWriter out = response.getWriter();
+        Locale locale = LocaleContextHolder.getLocale();
         out.write(new ObjectMapper().writeValueAsString(ResponseData.fail(ApiError.from(ApiErrorEnum.HAVE_NO_TOKEN_OR_TOKEN_EXPIRED))));
         out.flush();
         out.close();

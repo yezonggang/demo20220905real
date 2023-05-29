@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * <p>
@@ -35,9 +36,11 @@ public class UserController {
 
 
     @GetMapping("/getInfo")
-    public ResponseData loginInfo(HttpServletRequest request) {
+    public CompletableFuture<ResponseData> loginInfo(HttpServletRequest request) {
         log.info("begin to llogger login_info");
-        return userService.loginInfo(request);
+        return userService.loginInfo(request)
+                .thenApply(either->either.left.map(ResponseData::fail)
+                        .orElseGet(()->ResponseData.success(either.right.get())));
     }
 
 }

@@ -6,6 +6,7 @@ import com.quick.start.demo.VO.LoginInfoVO;
 import com.quick.start.demo.entity.*;
 import com.quick.start.demo.framework.exception.ApiError;
 import com.quick.start.demo.framework.exception.ApiErrorEnum;
+import com.quick.start.demo.framework.response.Either;
 import com.quick.start.demo.framework.response.ResponseData;
 import com.quick.start.demo.framework.response.ResponseMsgUtil;
 import com.quick.start.demo.mapper.*;
@@ -15,6 +16,9 @@ import com.quick.start.demo.utils.JsonWebTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.i18n.LocaleContext;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 /**
  * <p>
@@ -51,6 +58,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     JsonWebTokenUtil jwtTokenUtil;
     @Autowired
     RoleUserMapper roleUserMapper;
+
+    @Autowired
+    @Qualifier("vueExecutor")
+    Executor vueExecutor;
 
     @Autowired
     RoleMapper roleDao;
@@ -97,23 +108,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         }
     }
 
-    public ResponseData loginInfo(HttpServletRequest request) {
-        // 因为所有url都被过滤，所以这里只需要拿到role就行，不需要考虑token是否过期问题
-        String token = request.getHeader(jwtTokenUtil.getHeader());
-        LoginInfoVO loginInfoVO = new LoginInfoVO();
-        if(StringUtils.hasLength(token) && !token.equals("null")) {
-            String username = jwtTokenUtil.getUsernameIgnoreExpiration(token);
-            loginInfoVO.setName(username);
-            LambdaQueryWrapper<RoleEntity> queryWrapper = new QueryWrapper<RoleEntity>().lambda().eq(RoleEntity::getName, username);
-            List<RoleEntity> roleEntities = roleDao.selectList(queryWrapper);
-            List<String> roleList = new ArrayList<>();
-            for (RoleEntity roleEntity : roleEntities) {
-                roleList.add(roleEntity.getName());
+    public CompletableFuture<Either<ApiError,LoginInfoVO>> loginInfo(HttpServletRequest request) {
+        return CompletableFuture.supplyAsync(() -> {
+            // 因为所有url都被过滤，所以这里只需要拿到role就行，不需要考虑token是否过期问题
+            String token = request.getHeader(jwtTokenUtil.getHeader());
+            LoginInfoVO loginInfoVO = new LoginInfoVO();
+            if (StringUtils.hasLength(token) && !token.equals("null")) {
+                String username = jwtTokenUtil.getUsernameIgnoreExpiration(token);
+                loginInfoVO.setName(username);
+                LambdaQueryWrapper<RoleEntity> queryWrapper = new QueryWrapper<RoleEntity>().lambda().eq(RoleEntity::getName, username);
+                List<RoleEntity> roleEntities = roleDao.selectList(queryWrapper);
+                List<String> roleList = new ArrayList<>();
+                for (RoleEntity roleEntity : roleEntities) {
+                    roleList.add(roleEntity.getName());
+                }
+                loginInfoVO.setRoles(roleList);
+                return Either.Right(loginInfoVO);
             }
-            loginInfoVO.setRoles(roleList);
-            return ResponseData.success(loginInfoVO);
-        }
-        return ResponseData.fail(ApiError.from(ApiErrorEnum.TOKEN_EXPIRED));
+            return Either.Left(ApiError.from(ApiErrorEnum.TOKEN_EXPIRED));
+        },vueExecutor);
     }
 
 
@@ -149,6 +162,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
                 e.printStackTrace();
             }
         }
+    }
+
+    public CompletableFuture<Either<ApiError,List<UserEntity>>> getUserEntitySimple(){
+        return CompletableFuture.supplyAsync(() -> {
+            List<UserEntity> userEntities = userMapper.selectList(null);
+            if (userEntities.size() == 0) {
+                return Either.Left(ApiError.from(ApiErrorEnum.CHECK_DATABASE_WRONG));
+            } else {
+                return Either.Right(userEntities);
+            }
+        }, vueExecutor);
     }
 
 }

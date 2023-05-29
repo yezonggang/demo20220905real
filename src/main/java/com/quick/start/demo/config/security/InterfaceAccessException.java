@@ -3,6 +3,7 @@ package com.quick.start.demo.config.security;
 import com.quick.start.demo.framework.exception.ApiError;
 import com.quick.start.demo.framework.exception.ApiErrorEnum;
 import com.quick.start.demo.framework.response.ResponseData;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
