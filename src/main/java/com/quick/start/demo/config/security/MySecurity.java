@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,6 +53,18 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
 
     public static String LOGIN_URL = "/user/login";
 
+    public static List<String> urls = Arrays.asList(
+            "/user/login",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/v2/**",
+            "/api/**",
+            "/actuator/*",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/favicon.ico",
+            "/static/**",
+            "/resources/webjars/**");
 
     @Autowired
     LoginAuthProvider loginAuthProvider;
@@ -84,13 +97,17 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
         //当访问接口失败的配置
         http.exceptionHandling().authenticationEntryPoint(new InterfaceAccessException());
         http.authorizeRequests()
-                .antMatchers("/", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/**", "/api/**").permitAll()
+                .antMatchers(String.join(",",urls)).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().loginProcessingUrl(LOGIN_URL);
 
         // 登出接口
-        http.logout().logoutUrl("/user/logout").logoutSuccessHandler(logoutSuccessHandler()).deleteCookies(jsonWebTokenProperty.getHeader()).clearAuthentication(true);
+        http.logout()
+                .logoutUrl("/user/logout")
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .deleteCookies(jsonWebTokenProperty.getHeader())
+                .clearAuthentication(true);
 
         // 针对login请求拦截
         http.addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -99,22 +116,13 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // token拦截
-        http.addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
     @Bean(name = "myRequestMatcher")
     public SkipPathAntMatcher skipPathAntMatcher() {
-        List<String> uris = new LinkedList<>();
-        uris.add(LOGIN_URL);
-        uris.add("/swagger-resources/**");
-        uris.add("/webjars/**");
-        uris.add("/v2/**");
-        uris.add("/api/**");
-        uris.add("/actuator/*");
-        uris.add("/swagger-ui.html");
-        uris.add("/favicon.ico");
-        return new SkipPathAntMatcher(uris);
+        return new SkipPathAntMatcher(urls);
     }
 
     @Bean

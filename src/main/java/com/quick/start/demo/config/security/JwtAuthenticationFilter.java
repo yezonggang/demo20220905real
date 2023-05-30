@@ -87,7 +87,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static void reject(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("filtered url:" + request.getRequestURI());
         PrintWriter out = response.getWriter();
-        Locale locale = LocaleContextHolder.getLocale();
         out.write(new ObjectMapper().writeValueAsString(ResponseData.fail(ApiError.from(ApiErrorEnum.HAVE_NO_TOKEN_OR_TOKEN_EXPIRED))));
         out.flush();
         out.close();
