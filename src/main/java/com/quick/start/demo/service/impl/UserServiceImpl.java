@@ -60,7 +60,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     RoleUserMapper roleUserMapper;
 
     @Autowired
-    @Qualifier("vueExecutor")
+    @Qualifier("asyncExecutor")
     Executor vueExecutor;
 
     @Autowired
