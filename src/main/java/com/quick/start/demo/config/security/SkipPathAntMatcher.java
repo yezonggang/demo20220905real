@@ -16,7 +16,7 @@ public class SkipPathAntMatcher implements RequestMatcher {
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        if (pathsToSkip.isEmpty()) {
+        if (!pathsToSkip.isEmpty()) {
             for (String s : pathsToSkip) {
                 AntPathRequestMatcher antPathRequestMatcher = new AntPathRequestMatcher(s);
                 if (antPathRequestMatcher.matches(request)) {

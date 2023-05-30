@@ -111,6 +111,7 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
         uris.add("/webjars/**");
         uris.add("/v2/**");
         uris.add("/api/**");
+        uris.add("/actuator/*");
         uris.add("/swagger-ui.html");
         uris.add("/favicon.ico");
         return new SkipPathAntMatcher(uris);

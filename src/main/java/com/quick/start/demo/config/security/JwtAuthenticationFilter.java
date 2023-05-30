@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        logger.info(String.format("请求路径-->%s,是否通过滤器-->%s", request.getRequestURL(), requestMatcher.matches(request)));
+        logger.info(String.format("请求路径-->%s,是否匹配自定义的屏蔽url并放行-->%s", request.getRequestURL(), requestMatcher.matches(request)));
         return requestMatcher.matches(request);
     }
 
