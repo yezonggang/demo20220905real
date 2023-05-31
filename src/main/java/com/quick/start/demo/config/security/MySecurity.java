@@ -61,10 +61,13 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
             "/api/**",
             "/actuator/*",
             "/swagger-ui.html",
+            "/swagger-ui/**",
             "/swagger-resources/**",
             "/favicon.ico",
             "/static/**",
-            "/resources/webjars/**");
+            "/resources/webjars/**",
+            "/actuator/**",
+            "/actuator/**/**");
 
     @Autowired
     LoginAuthProvider loginAuthProvider;
@@ -83,12 +86,13 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
     @Autowired
     JsonWebTokenProperty jsonWebTokenProperty;
 
-    // 先认证后鉴权
+    // 先认证
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(loginAuthProvider);
     }
 
+    // 后鉴权
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         //允许跨域，配置后SpringSecurity会自动寻找name=corsConfigurationSource的Bean
@@ -100,7 +104,11 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(String.join(",",urls)).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().loginProcessingUrl(LOGIN_URL);
+                .formLogin().loginProcessingUrl(LOGIN_URL)
+                // 针对login请求自定义success和failure处理器
+                .and()
+                .addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         // 登出接口
         http.logout()
@@ -109,14 +117,8 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
                 .deleteCookies(jsonWebTokenProperty.getHeader())
                 .clearAuthentication(true);
 
-        // 针对login请求拦截
-        http.addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
         //因为用不到session，所以选择禁用
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        // token拦截
-        http.addFilterAfter(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 

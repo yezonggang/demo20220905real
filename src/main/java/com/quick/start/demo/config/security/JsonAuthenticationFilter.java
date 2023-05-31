@@ -1,5 +1,6 @@
 package com.quick.start.demo.config.security;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -35,10 +36,10 @@ public class JsonAuthenticationFilter extends UsernamePasswordAuthenticationFilt
         if ( request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)
                 ||request.getContentType().equals(APPLICATION_JSON_UTF8_VALUE_MY)  ){
             ObjectMapper mapper = new ObjectMapper();
-            UsernamePasswordAuthenticationToken authenticationToken = null;
+            UsernamePasswordAuthenticationToken authenticationToken;
             try {
                 InputStream is = request.getInputStream();
-                Map<String,String> authenticationBean = mapper.readValue(is,Map.class);
+                Map authenticationBean = mapper.readValue(is,Map.class);
                 authenticationToken = new UsernamePasswordAuthenticationToken(authenticationBean.get("username"),
                         authenticationBean.get("password"));
             }catch (IOException e){

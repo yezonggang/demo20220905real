@@ -82,11 +82,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             detail.setUsername(user.getUsername());
             detail.setPassword(user.getPassword());
             logger.info(String.format("xxxxxxxxxxuser_id,%s", user.getId()));
-            AccountStateEntity accountState = accountStateDao.selectOne(new QueryWrapper<AccountStateEntity>().lambda().eq(AccountStateEntity::getUserid, user.getId()));
-/*                detail.setAccountNonExpired(accountState.getAccountNonExpired() == 1);
-                detail.setAccountNonLocked(accountState.getAccountNonLocked() == 1);
-                detail.setEnabled(accountState.getEnabled() == 1);
-                detail.setCredentialsNonExpired(accountState.getCredentialsNonExpired() == 1);*/
             detail.setAccountNonExpired(true);
             detail.setAccountNonLocked(true);
             detail.setEnabled(true);
